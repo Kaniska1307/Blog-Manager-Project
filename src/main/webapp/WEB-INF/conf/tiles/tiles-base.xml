@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+ "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<!-- Home Layout -->
+	<definition name="homelayout"
+		template="/layout/homeLayout.jsp">
+		<put-attribute name="header"
+			value="/jsps/common/header.jsp" />
+		<put-attribute name="left" value="/jsps/common/left.jsp" />
+		<put-attribute name="middle"
+			value="/jsps/home/homeCenter.jsp" />
+		<put-attribute name="right"
+			value="/jsps/common/empty.jsp" />
+		<put-attribute name="footer"
+			value="/jsps/common/footer.jsp" />
+	</definition>
+
+
+	<!-- <definition name="homelayout" extends="main-layout" template="/jsps/common/homeLayout.jsp"> 
+		<put-attribute name="middle" value="/jsps/center.jsp" /> </definition> -->
+
+
+
+	<!-- Blog Author View -->
+	<definition name="blogAuthors" extends="homelayout"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="right"
+			value="/jsps/blogAuthors/blogAuthors-right.jsp" />
+		<put-attribute name="middle"
+			value="/jsps/blogAuthors/blogAuthors-view.jsp" />
+
+	</definition>
+
+	<!-- Blog Author Add -->
+	<definition name="blogAuthorsAdd" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogAuthors/blogAuthors-add.jsp" />
+	</definition>
+	<!-- Blog Author Edit -->
+	<definition name="blogAuthorsEdit" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogAuthors/blogAuthors-edit.jsp" />
+	</definition>
+	<!-- Blog author Update -->
+	<definition name="blogAuthorsUpdate"
+		template="/jsps/blogAuthors/blogAuthors-update.jsp" />
+
+	<!-- Blog Category View -->
+	<definition name="blogCategory" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogCategory/blogCategory-view.jsp" />
+		<put-attribute name="right"
+			value="/jsps/blogCategory/blogCategory-right.jsp" />
+	</definition>
+
+	<!-- Blog Category Add -->
+	<definition name="blogCategoryAdd" extends="blogCategory"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogCategory/blogCategory-add.jsp" />
+	</definition>
+
+	<!-- Blog Category Edit -->
+	<definition name="blogCategoryEdit" extends="blogCategory"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogCategory/blogCategory-edit.jsp" />
+	</definition>
+
+	<!-- Blog category Update -->
+	<definition name="blogCategoryUpdate" extends="blogCategoryEdit"
+		template="/jsps/blogCategory/blogCategory-update.jsp" />
+
+	<!-- Blogs View -->
+
+	<definition name="blogs" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogs/blogsView.jsp" />
+		<put-attribute name="right"
+			value="/jsps/blogs/blogsRight.jsp" />
+	</definition>
+
+	<!-- Blogs Add -->
+
+	<definition name="blogsAdd" extends="blogs"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogs/blogsAdd.jsp" />
+	</definition>
+
+	<!-- Blogs Edit -->
+
+	<definition name="blogsEdit" extends="blogs"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogs/blogsEdit.jsp" />
+	</definition>
+
+	<!-- Blog Post -->
+
+	<definition name="blog-post" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="right"
+			value="/jsps/blogPosts/blogPosts-right.jsp" />
+		<put-attribute name="middle"
+			value="/jsps/blogPosts/blogPost-view.jsp" />
+	</definition>
+
+	<!-- Blog Post Add -->
+
+	<definition name="blog-post-add" extends="blogAuthors"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="right"
+			value="/jsps/blogPosts/blogPosts-right.jsp" />
+		<put-attribute name="middle"
+			value="/jsps/blogPosts/blogPost-add.jsp" />
+	</definition>
+
+
+	<!-- Blog Post View -->
+
+	<definition name="blog-post-view" extends="blog-post"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogPosts/blogPost-view.jsp" />
+	</definition>
+
+
+	<!-- Blog Post Edit -->
+
+	<definition name="blog-post-edit" extends="blog-post"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/blogPosts/blogPost-edit.jsp" />
+	</definition>
+	<definition name="blog-post-loadpostdetails"
+		template="/jsps/blogPosts/blogPost-loadPostDetails.jsp"></definition>
+
+
+	<!-- Attach Category -->
+
+	<definition name="attach-category" extends="blog-post"
+		template="/layout/blogAuthorsLayout.jsp">
+		<put-attribute name="middle"
+			value="/jsps/attachCategory/attachCategory-center.jsp" />
+		<put-attribute name="right"
+			value="/jsps/attachCategory/attachCategory-right.jsp" />
+	</definition>
+	<definition name="attach-category-view"
+		template="/jsps/attachCategory/attachCategory-view.jsp"></definition>
+
+</tiles-definitions>
+
+
+

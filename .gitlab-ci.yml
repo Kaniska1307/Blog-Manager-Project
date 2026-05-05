@@ -1,0 +1,135 @@
+stages:
+  - build
+  - deploy_dev
+  - deploy_stage
+  - deploy_stage2
+  - approve_live
+  - deploy_live
+  - approve_fo
+  - deploy_fo
+
+build:
+  stage: build
+  before_script:
+    - source /etc/profile.d/gradle.sh
+  script: gradle clean war
+  when: manual
+  allow_failure: false
+  only:
+    - develop
+    - stage_1
+    - stage_2
+    - prod
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+  artifacts:
+    paths:
+      - build/libs/wscug2.war
+
+deploy_war:
+  stage: deploy_dev
+  needs:
+    - build
+  before_script:
+    - ssh $DEV_WL_SERVER_LOGIN "rm -f /u02/war_files/wscug2.war"
+  script: 
+    - scp build/libs/wscug2.war $DEV_WL_SERVER_LOGIN:/u02/war_files/wscug2.war
+    - ssh $DEV_WL_SERVER_LOGIN "/u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -adminurl t3s://$DEV_WL_INTERNAL_IP:1156 -username $DEV_WL_ADMIN_CONSOLE_USER_NAME -password $DEV_WL_ADMIN_CONSOLE_USER_PASS -undeploy -name wscug2 -targets Server1,Server2 && /u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -verbose -noexit -adminurl t3s://$DEV_WL_INTERNAL_IP:1156 -username $DEV_WL_ADMIN_CONSOLE_USER_NAME -password $DEV_WL_ADMIN_CONSOLE_USER_PASS -deploy -name wscug2 -targets Server1,Server2 -source "/u02/war_files/wscug2.war""
+  environment:
+    name: DEV
+  when: manual
+  only:
+    - develop
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+deploy_war_stage:
+  stage: deploy_stage
+  needs:
+    - build
+  before_script:
+    - ssh $TEST_WL_SERVER_LOGIN "rm -f /u02/war_files/wscug2.war"
+  script: 
+    - scp build/libs/wscug2.war $TEST_WL_SERVER_LOGIN:/u02/war_files/wscug2.war
+    - ssh $TEST_WL_SERVER_LOGIN "/u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -adminurl t3s://localhost:1156 -username $TEST_WL_ADMIN_CONSOLE_USER_NAME -password $TEST_WL_ADMIN_CONSOLE_USER_PASS -undeploy -name wscug2 -targets Server1,Server2,Server3 && /u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -verbose -noexit -adminurl t3s://localhost:1156 -username $TEST_WL_ADMIN_CONSOLE_USER_NAME -password $TEST_WL_ADMIN_CONSOLE_USER_PASS -deploy -name wscug2 -targets Server1,Server2,Server3 -source "/u02/war_files/wscug2.war""
+  environment:
+    name: TEST
+  when: manual
+  only:
+    - stage_1
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+deploy_war_stage2:
+  stage: deploy_stage2
+  needs:
+    - build
+  before_script:
+    - ssh $TEST_WL_SERVER_LOGIN "rm -f /u02/war_files/wscug2.war"
+  script: 
+    - scp build/libs/wscug2.war $TEST_WL_SERVER_LOGIN:/u02/war_files/wscug2.war
+    - ssh $TEST_WL_SERVER_LOGIN "/u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -adminurl t3s://localhost:1156 -username $TEST_WL_ADMIN_CONSOLE_USER_NAME -password $TEST_WL_ADMIN_CONSOLE_USER_PASS -undeploy -name wscug2 -targets Server1,Server2,Server3 && /u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -verbose -noexit -adminurl t3s://localhost:1156 -username $TEST_WL_ADMIN_CONSOLE_USER_NAME -password $TEST_WL_ADMIN_CONSOLE_USER_PASS -deploy -name wscug2 -targets Server1,Server2,Server3 -source "/u02/war_files/wscug2.war""
+  environment:
+    name: TEST
+  when: manual
+  only:
+    - stage_2
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+approve_live:
+  stage: approve_live
+  script: 
+    - echo "Approved for LIVE Depployment"
+  environment:
+    name: APPROVE
+  when: manual
+  allow_failure: false
+  only:
+    - prod
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+deploy_war_live:
+  stage: deploy_live
+  before_script:
+    - ssh $LIVE_WL_SERVER_LOGIN "rm -f /u02/war_files/wscug2.war"
+  script: 
+    - scp build/libs/wscug2.war $LIVE_WL_SERVER_LOGIN:/u02/war_files/wscug2.war
+    - ssh $LIVE_WL_SERVER_LOGIN "/u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -adminurl t3://$LIVE_WL_INTERNAL_IP:1156 -username $LIVE_WL_ADMIN_CONSOLE_USER_NAME -password $LIVE_WL_ADMIN_CONSOLE_USER_PASS -undeploy -name wscug2 -targets Server1,Server2,Server3,Server4,Server5,Server6,Server7,Server8,SpillServer1,SpillServer2,SpillServer3,SpillServer4 && /u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -verbose -noexit -adminurl t3://$LIVE_WL_INTERNAL_IP:1156 -username $LIVE_WL_ADMIN_CONSOLE_USER_NAME -password $LIVE_WL_ADMIN_CONSOLE_USER_PASS -deploy -name wscug2 -targets Server1,Server2,Server3,Server4,Server5,Server6,Server7,Server8,SpillServer1,SpillServer2,SpillServer3,SpillServer4 -source "/u02/war_files/wscug2.war""
+  environment:
+    name: LIVE
+  when: manual
+  allow_failure: false
+  only:
+    - prod
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+approve_fo:
+  stage: approve_fo
+  script: 
+    - echo "Approved for FO Depployment"
+  environment:
+    name: APPROVE
+  when: manual
+  allow_failure: false
+  only:
+    - prod
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
+
+deploy_war_fo:
+  stage: deploy_fo
+  before_script:
+    - ssh $FO_WL_SERVER_LOGIN "rm -f /u02/war_files/wscug2.war"
+  script: 
+    - scp build/libs/wscug2.war $FO_WL_SERVER_LOGIN:/u02/war_files/wscug2.war
+    - ssh $FO_WL_SERVER_LOGIN "/u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -adminurl t3://$FO_WL_INTERNAL_IP:1156 -username $FO_WL_ADMIN_CONSOLE_USER_NAME -password $FO_WL_ADMIN_CONSOLE_USER_PASS -undeploy -name wscug2 -targets Server1,Server2,Server3,Server4,Server5,Server6,Server7,Server8,Server9,Server10,Server11,Server12,Server13,Server14,Server15,Server16,Server17,Server18 && /u02/app/oracle/jdk1.8/bin/java -Dweblogic.security.SSL.ignoreHostnameVerification=true -cp "/u02/app/oracle/Middleware/wlserver/server/lib/weblogic.jar" weblogic.Deployer -verbose -noexit -adminurl t3://$FO_WL_INTERNAL_IP:1156 -username $FO_WL_ADMIN_CONSOLE_USER_NAME -password $FO_WL_ADMIN_CONSOLE_USER_PASS -deploy -name wscug2 -targets Server1,Server2,Server3,Server4,Server5,Server6,Server7,Server8,Server9,Server10,Server11,Server12,Server13,Server14,Server15,Server16,Server17,Server18 -source "/u02/war_files/wscug2.war""
+  environment:
+    name: FO
+  when: manual
+  only:
+    - prod
+  tags:
+    - sp-chennai-dc-gitlab-runner-fargate
